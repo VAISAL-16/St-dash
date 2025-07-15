@@ -27,9 +27,7 @@ export default function StudentList() {
 
   return (
     <div className={isDark ? 'dark' : ''}>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 transition-colors duration-300">
-
-        
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 transition-colors duration-300">        
         {/* 🔥 Header */}
         <div className="sticky top-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">

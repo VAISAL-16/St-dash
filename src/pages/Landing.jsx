@@ -15,7 +15,7 @@ export default function Landing() {
         transition={{ duration: 0.8 }}
         className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white mb-10 text-center"
       >
-        Welcome to the Central Access Portal
+        Welcome to the JD Nive Portal
         <span className="block text-lg sm:text-xl font-medium text-gray-600 dark:text-gray-400 mt-2">
           Choose your role to continue
         </span>
