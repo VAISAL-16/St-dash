@@ -35,6 +35,10 @@ export default function Login() {
     }
   };
 
+  const handleForgotPassword = () => {
+    alert('Please contact the system administrator to reset your password.');
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 px-4">
       <form
@@ -60,6 +64,7 @@ export default function Login() {
               className="w-full mb-4 px-4 py-2 border rounded-lg"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              required
             />
             <div className="relative mb-4">
               <input
@@ -68,6 +73,7 @@ export default function Login() {
                 className="w-full px-4 py-2 border rounded-lg pr-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <span
                 className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"
@@ -75,6 +81,16 @@ export default function Login() {
               >
                 {showPass ? <FaEyeSlash /> : <FaEye />}
               </span>
+            </div>
+
+            <div className="mb-4 text-sm text-right">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-blue-600 hover:underline"
+              >
+                Forgot Password?
+              </button>
             </div>
 
             {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
@@ -88,7 +104,6 @@ export default function Login() {
           </>
         )}
 
-        {/* 🔙 Back Button */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

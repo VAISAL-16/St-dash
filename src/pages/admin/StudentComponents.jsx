@@ -23,7 +23,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useNavigate,Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export default function StudentComponents() {
@@ -37,6 +37,7 @@ export default function StudentComponents() {
     roll: '',
     name: '',
     department: '',
+    email: '',
     image: '',
     password: ''
   });
@@ -49,6 +50,7 @@ export default function StudentComponents() {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('roll');
   const [page, setPage] = useState(0);
+  const [deleteIndex, setDeleteIndex] = useState(null); // for confirmation dialog
   const rowsPerPage = 5;
 
   useEffect(() => {
@@ -62,60 +64,62 @@ export default function StudentComponents() {
   };
 
   const sortedStudents = [...students]
-    .filter((stu) =>
-      (stu.name.toLowerCase().includes(search.toLowerCase()) ||
-        stu.roll.toLowerCase().includes(search.toLowerCase())) &&
-      (filterDept === 'All' || stu.department === filterDept)
-    )
-    .sort((a, b) => {
-      const aVal = a[orderBy]?.toLowerCase?.() || '';
-      const bVal = b[orderBy]?.toLowerCase?.() || '';
-      return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-    });
+  .filter((stu) =>
+    !stu.isDeleted && // ✅ filter out soft-deleted
+    (stu.name.toLowerCase().includes(search.toLowerCase()) ||
+      stu.roll.toLowerCase().includes(search.toLowerCase())) &&
+    (filterDept === 'All' || stu.department === filterDept)
+  )
+  .sort((a, b) => {
+    const aVal = a[orderBy]?.toLowerCase?.() || '';
+    const bVal = b[orderBy]?.toLowerCase?.() || '';
+    return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+  });
 
   const pageCount = Math.ceil(sortedStudents.length / rowsPerPage);
   const paginatedStudents = sortedStudents.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (!form.roll || !form.name || !form.department) {
+
+    if (!form.roll || !form.name || !form.department || !form.email) {
       return toast.error('Required fields missing');
     }
 
     const duplicate = students.some((s, i) => s.roll === form.roll && i !== editIndex);
     if (duplicate) return toast.error('Roll number already exists!');
 
-    const updated = [...students];
     const formattedForm = {
-  ...form,
-  name: form.name.toUpperCase(), // Capitalize name
-};
+      ...form,
+      name: form.name.toUpperCase(),
+      isDeleted: false, 
+    };
 
-if (editIndex !== null) {
-  updated[editIndex] = formattedForm;
-  toast.success('Student updated!');
-} else {
-  updated.push(formattedForm);
-  toast.success('Student added!');
-}
-
+    const updated = [...students];
+    if (editIndex !== null) {
+      updated[editIndex] = formattedForm;
+      toast.success('Student updated!');
+    } else {
+      updated.push(formattedForm);
+      toast.success('Student added!');
+    }
 
     setStudents(updated);
-    setForm({ roll: '', name: '', department: '', image: '', password: '' });
+    setForm({ roll: '', name: '', department: '', email: '', image: '', password: '' });
     setEditIndex(null);
     setShowForm(false);
   };
 
   const handleDelete = (index) => {
-    const updated = [...students];
-    updated.splice(index, 1);
-    setStudents(updated);
-    toast.success('Student deleted!');
-  };
+  const updated = [...students];
+  updated[index].isDeleted = true; // ✅ soft-delete
+  setStudents(updated);
+  toast.success('Student deleted (soft)');
+};
 
   return (
     <Box p={2}>
-      {/* Gradient Header */}
+      {/* Header */}
       <Box
         sx={{
           background: 'linear-gradient(to right, violet, lightblue)',
@@ -131,7 +135,7 @@ if (editIndex !== null) {
         <Typography level="body-md">Manage your student records with style</Typography>
       </Box>
 
-      {/* Search + Filter */}
+      {/* Filter */}
       <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
         <Input
           placeholder="Search by name or roll"
@@ -154,27 +158,13 @@ if (editIndex !== null) {
         <Button onClick={() => setShowForm(true)}>Add Student</Button>
       </Box>
 
-      {/* Student Table */}
-      <Sheet
-        variant="outlined"
-        sx={{
-          borderRadius: 'lg',
-          overflow: 'auto',
-          boxShadow: 'sm',
-          mt: 2,
-        }}
-      >
-        <Table
-          borderAxis="both"
-          stickyHeader
-          hoverRow
-          stripe="odd"
-          sx={{
-            minWidth: 650,
-            '& th': { backgroundColor: '#f0f4f8' },
-            '& td, & th': { textAlign: 'center', p: 1.5 },
-          }}
-        >
+      {/* Table */}
+      <Sheet variant="outlined" sx={{ borderRadius: 'lg', overflow: 'auto', boxShadow: 'sm', mt: 2 }}>
+        <Table borderAxis="both" stickyHeader hoverRow stripe="odd" sx={{
+          minWidth: 650,
+          '& th': { backgroundColor: '#f0f4f8' },
+          '& td, & th': { textAlign: 'center', p: 1.5 },
+        }}>
           <thead>
             <tr>
               <th>S.No</th>
@@ -188,26 +178,9 @@ if (editIndex !== null) {
                   Roll
                 </Button>
               </th>
-              <th>
-                <Button
-                  size="sm"
-                  variant="soft"
-                  onClick={() => handleSort('name')}
-                  endDecorator={<ArrowDownwardIcon fontSize="small" />}
-                >
-                  Name
-                </Button>
-              </th>
-              <th>
-                <Button
-                  size="sm"
-                  variant="soft"
-                  onClick={() => handleSort('department')}
-                  endDecorator={<ArrowDownwardIcon fontSize="small" />}
-                >
-                  Department
-                </Button>
-              </th>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Email</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -218,6 +191,7 @@ if (editIndex !== null) {
                 <td>{student.roll}</td>
                 <td>{student.name}</td>
                 <td>{student.department}</td>
+                <td>{student.email || '-'}</td>
                 <td>
                   <Box display="flex" justifyContent="center" gap={1}>
                     <Button
@@ -226,7 +200,8 @@ if (editIndex !== null) {
                       variant="soft"
                       onClick={() => {
                         setForm(student);
-                        setEditIndex(i);
+                        const actualIndex = students.findIndex((s) => s.roll === student.roll);
+                        setEditIndex(actualIndex);
                         setShowForm(true);
                       }}
                     >
@@ -244,7 +219,10 @@ if (editIndex !== null) {
                       size="sm"
                       color="danger"
                       variant="soft"
-                      onClick={() => handleDelete(i)}
+                      onClick={() => {
+                        const actualIndex = students.findIndex((s) => s.roll === student.roll);
+                        setDeleteIndex(actualIndex);
+                      }}
                     >
                       Delete
                     </Button>
@@ -255,50 +233,39 @@ if (editIndex !== null) {
           </tbody>
         </Table>
 
-        {/* Custom Pagination */}
-     <Box
-  display="flex"
-  alignItems="center"
-  justifyContent="space-between"
-  px={2}
-  py={1.5}
-  sx={{
-    borderTop: '1px solid #ddd',
-    background: '#f8f9fa',
-    borderRadius: '0 0 10px 10px',
-  }}
->
-  <Box flex={1} />
-
-  <Box flex={1} display="flex" justifyContent="center" gap={1}>
-    <Button
-      size="sm"
-      variant="outlined"
-      disabled={page === 0}
-      onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-      sx={{ minWidth: 40 }}
-    >
-      &lt;
-    </Button>
-    <Button
-      size="sm"
-      variant="outlined"
-      disabled={page >= pageCount - 1}
-      onClick={() => setPage((prev) => Math.min(prev + 1, pageCount - 1))}
-      sx={{ minWidth: 40 }}
-    >
-      &gt;
-    </Button>
-  </Box>
-
-  <Box flex={1} display="flex" justifyContent="flex-end">
-    <Typography level="body-sm">
-      Showing {paginatedStudents.length} of {sortedStudents.length} entries
-    </Typography>
-  </Box>
-</Box>
-
-
+        {/* Pagination */}
+        <Box display="flex" justifyContent="space-between" px={2} py={1.5} sx={{
+          borderTop: '1px solid #ddd',
+          background: '#f8f9fa',
+          borderRadius: '0 0 10px 10px',
+        }}>
+          <Box flex={1}></Box>
+          <Box flex={1} display="flex" justifyContent="center" gap={1}>
+            <Button
+              size="sm"
+              variant="outlined"
+              disabled={page === 0}
+              onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+              sx={{ minWidth: 40 }}
+            >
+              &lt;
+            </Button>
+            <Button
+              size="sm"
+              variant="outlined"
+              disabled={page >= pageCount - 1}
+              onClick={() => setPage((prev) => Math.min(prev + 1, pageCount - 1))}
+              sx={{ minWidth: 40 }}
+            >
+              &gt;
+            </Button>
+          </Box>
+          <Box flex={1} display="flex" justifyContent="flex-end">
+            <Typography level="body-sm">
+              Showing {paginatedStudents.length} of {sortedStudents.length} entries
+            </Typography>
+          </Box>
+        </Box>
       </Sheet>
 
       {/* Add/Edit Modal */}
@@ -320,6 +287,14 @@ if (editIndex !== null) {
                 placeholder="Name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+              <Input
+                fullWidth
+                required
+                placeholder="Email"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
               <Select
                 fullWidth
@@ -383,6 +358,30 @@ if (editIndex !== null) {
           </DialogActions>
         </form>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteIndex !== null} onClose={() => setDeleteIndex(null)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this student?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="danger"
+            onClick={() => {
+              if (deleteIndex !== null) {
+                handleDelete(deleteIndex);
+                setDeleteIndex(null);
+              }
+            }}
+          >
+            Yes, Delete
+          </Button>
+          <Button variant="soft" onClick={() => setDeleteIndex(null)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Back to Dashboard */}
       <Box mt={4} display="flex" justifyContent="center">
         <Link
           to="/dashboard"

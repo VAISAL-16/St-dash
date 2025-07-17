@@ -1,16 +1,16 @@
-// src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
-import Landing from './pages/Landing';
+// Auth Pages
 import Login from './pages/admin/Login';
 import StudentLogin from './pages/StudentLogin';
 import InstitutionLogin from './pages/institution/InstitutionLogin';
+import VerifyOtp from './pages/VerifyOtp';
 
-import ProtectedRoute from './components/ProtectedRoute';
-// import InstitutionProtectedRoute from './components/InstitutionProtectedRoute';
-import CollegeLanding from './CollegeLanding';
+// Public Pages
+import Landing from './pages/Landing';
 
+// Admin Dashboard Layout + Pages
 import DashboardLayout from './layouts/DashboardLayout';
 import StudentList from './pages/StudentList';
 import StudentComponents from './pages/admin/StudentComponents';
@@ -18,26 +18,32 @@ import StudentView from './pages/admin/StudentView';
 import AttendanceManager from './pages/admin/AttendanceManager';
 import MonthlyAttendanceSummary from './pages/admin/MonthlyAttendanceSummary';
 import AttendanceAnalytics from './pages/admin/AttendanceAnalytics';
+
+// Student Pages
 import StudentProfile from './pages/StudentProfile';
 
+// Institution Dashboard Layout + Pages
 import InstitutionDashboard from './pages/institution/InstitutionDashboard';
-// import InstitutionOverview from './pages/institution/InstitutionOverview';
-// import ManageStudents from './pages/institution/ManageStudents';
-// import ManageStaff from './pages/institution/ManageStaff';
+import InstitutionOverview from './pages/institution/InstitutionOverview';
+
+// Route Guard
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
       <Routes>
-        {/* <Route path="/" element={<CollegeLanding />} /> */}
+
         {/* ✅ Public Routes */}
-         <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/institution-login" element={<InstitutionLogin />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
 
-        {/* <Route
+        {/* ✅ Admin Dashboard Routes */}
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute role="admin">
@@ -47,7 +53,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
         <Route
           path="/students-components"
           element={
@@ -99,7 +104,7 @@ function App() {
           }
         />
 
-        
+        {/* ✅ Student Route */}
         <Route
           path="/student-profile"
           element={
@@ -107,23 +112,22 @@ function App() {
               <StudentProfile />
             </ProtectedRoute>
           }
-        /> */}
+        />
 
-       <Route
-  path="/institution-dashboard"
-  element={
-    <ProtectedRoute role="institution">
-      <InstitutionDashboard />
-    </ProtectedRoute>
-  }
-/>
-          {/* <Route index element={<InstitutionOverview />} /> */}
-          {/* <Route path="students" element={<ManageStudents />} />
-          <Route path="staff" element={<ManageStaff />} />
-          <Route path="analytics" element={<div>Analytics coming soon...</div>} /> */}
-        {/* </Route> */}
+        {/* ✅ Institution Dashboard with nested pages */}
+        <Route
+          path="/institution-dashboard"
+          element={
+            <ProtectedRoute role="institution">
+              <InstitutionDashboard />
+            </ProtectedRoute>
+          }
+        >
+          {/* ⬇️ Default overview page for sidebar */}
+          <Route index element={<InstitutionOverview />} />
+        </Route>
 
-        {/* ✅ Fallback */}
+        {/* ❌ Optional fallback */}
         {/* <Route path="*" element={<Landing />} /> */}
       </Routes>
     </BrowserRouter>
