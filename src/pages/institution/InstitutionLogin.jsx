@@ -8,6 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 const allowedInstitutions = [
   { username: 'c', password: '00' },
+  { username: 'surya', password: '123' },
   { username: 'department456', password: 'inst456' }
 ];
 

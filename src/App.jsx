@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 // Auth Pages
+// Public pages
+// import Landing from './pages/Landing';
 import Login from './pages/admin/Login';
 import StudentLogin from './pages/StudentLogin';
 import InstitutionLogin from './pages/institution/InstitutionLogin';
@@ -29,6 +31,12 @@ import InstitutionOverview from './pages/institution/InstitutionOverview';
 
 // Route Guard
 import ProtectedRoute from './components/ProtectedRoute';
+// Protected route wrapper
+// import ProtectedRoute from './components/ProtectedRoute';
+
+// Institution dashboard layout and pages
+// import InstitutionDashboard from './pages/institution/InstitutionDashboard';
+import ManageStaff from './pages/institution/ManageStaff';
 
 function App() {
   return (
@@ -37,6 +45,7 @@ function App() {
       <Routes>
 
         {/* ✅ Public Routes */}
+        {/* Public Routes */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/student-login" element={<StudentLogin />} />
@@ -54,13 +63,12 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Institution Dashboard with Nested Routes */}
         <Route
-          path="/students-components"
+          path="/institution-dashboard"
           element={
-            <ProtectedRoute role="admin">
-              <DashboardLayout>
-                <StudentComponents />
-              </DashboardLayout>
+            <ProtectedRoute role="institution">
+              <InstitutionDashboard />
             </ProtectedRoute>
           }
         />
@@ -128,10 +136,15 @@ function App() {
         >
           {/* ⬇️ Default overview page for sidebar */}
           <Route index element={<InstitutionOverview />} />
+          <Route path="staff" element={<ManageStaff />} />
         </Route>
 
         {/* ❌ Optional fallback */}
         {/* <Route path="*" element={<Landing />} /> */}
+        
+          
+        {/* </Route> */}
+        
       </Routes>
     </BrowserRouter>
   );
