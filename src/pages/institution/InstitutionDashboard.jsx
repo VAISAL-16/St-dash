@@ -1,6 +1,7 @@
 // src/pages/institution/InstitutionDashboard.jsx
 import React, { useState } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
+import Topbar from '../../components/Topbar';
 import {
   FaUserGraduate,
   FaChalkboardTeacher,
@@ -32,7 +33,7 @@ export default function InstitutionDashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar */}
+    
       <aside className="w-72 bg-white dark:bg-gray-800 p-6 space-y-6 shadow-xl">
         <h1 className="text-2xl font-bold text-red-600 dark:text-red-400">
           Institution Panel
@@ -159,9 +160,13 @@ export default function InstitutionDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 overflow-y-auto">
-        <Outlet />
-      </main>
+      <main className="flex-1 flex flex-col">
+  <Topbar role="Institution" userName="Admin" onChatClick={() => navigate('/institution-dashboard/chat')} />
+  <div className="flex-1 p-6 overflow-y-auto">
+    <Outlet />
+  </div>
+</main>
+
     </div>
   );
 }

@@ -1,10 +1,17 @@
+// src/pages/StudentLogin.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaUserGraduate } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import emailjs from '@emailjs/browser';
+import toast from 'react-hot-toast';
 
 export default function StudentLogin() {
   const [roll, setRoll] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [showEmailInput, setShowEmailInput] = useState(false);
+  const [rateLimit, setRateLimit] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
@@ -26,14 +33,43 @@ export default function StudentLogin() {
     }
   };
 
-  const handleForgotPassword = () => {
+  const handleSendOtp = async () => {
     const student = students.find((s) => s.roll === roll);
-    if (!roll) {
-      setInfo('Please enter your Roll Number first.');
-    } else if (!student) {
-      setInfo('No student found with this Roll Number.');
-    } else {
-      setInfo(`A password reset link has been sent to your registered email.`);
+
+    if (!roll) return setInfo('Please enter Roll Number first.');
+    if (!student) return setError('Student not found.');
+    if (!email) return setError('Please enter your email.');
+    if (student.email !== email) return setError('Email does not match.');
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+    // Save OTP data to localStorage
+    localStorage.setItem('resetOtp', otpCode);
+    localStorage.setItem('resetRoll', roll);
+    localStorage.setItem('resetEmail', email);
+    localStorage.setItem('otpExpiry', expiry.toString());
+
+    const templateParams = {
+      email: student.email,
+      otp: `<b>${otpCode}</b>`,
+      roll: student.roll,
+    };
+
+    try {
+      await emailjs.send(
+        'service_k27z0kq',
+        'template_w186l7r',
+        templateParams,
+        'l7UCg_Uu2vDgrUG6x'
+      );
+      toast.success('OTP sent to your email.');
+      setRateLimit(true);
+      setTimeout(() => setRateLimit(false), 60000);
+      navigate('/verify-otp');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to send OTP.');
     }
   };
 
@@ -57,41 +93,78 @@ export default function StudentLogin() {
           onChange={(e) => setRoll(e.target.value)}
         />
 
-        <div className="relative mb-2">
-          <input
-            type={showPass ? 'text' : 'password'}
-            placeholder="Password"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg pr-10"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <span
-            onClick={() => setShowPass(!showPass)}
-            className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-          >
-            {showPass ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
+        {!showEmailInput && (
+          <div className="relative mb-2">
+            <input
+              type={showPass ? 'text' : 'password'}
+              placeholder="Password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg pr-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <span
+              onClick={() => setShowPass(!showPass)}
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+            >
+              {showPass ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
+        )}
 
-        <div className="mb-4 text-sm text-right">
-          <button
-            type="button"
-            onClick={handleForgotPassword}
-            className="text-green-600 hover:underline"
-          >
-            Forgot Password?
-          </button>
-        </div>
+        {showEmailInput && (
+          <input
+            type="email"
+            placeholder="Enter your registered email"
+            className="w-full mb-4 px-4 py-2 border border-blue-300 rounded-lg bg-blue-50"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        )}
+
+        {!showEmailInput ? (
+          <div className="mb-4 text-sm text-right">
+            <button
+              type="button"
+              onClick={() => setShowEmailInput(true)}
+              className="text-green-600 hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
+        ) : (
+          <div className="mb-4 text-sm text-right">
+            <button
+              type="button"
+              onClick={handleSendOtp}
+              className={`text-green-700 hover:underline font-semibold ${rateLimit && 'opacity-50 pointer-events-none'}`}
+              disabled={rateLimit}
+            >
+              {rateLimit ? 'Please wait 60s...' : 'Send OTP'}
+            </button>
+          </div>
+        )}
 
         {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
         {info && <p className="text-green-700 text-sm mb-2">{info}</p>}
 
-        <button
-          type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg"
+        {!showEmailInput && (
+          <button
+            type="submit"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg"
+          >
+            Login
+          </button>
+        )}
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/')}
+          type="button"
+          className="mt-6 w-full border border-green-400 text-green-600 hover:bg-green-50 font-medium py-2 rounded-lg transition"
         >
-          Login
-        </button>
+          ⬅ Back to Landing
+        </motion.button>
       </form>
     </div>
   );
