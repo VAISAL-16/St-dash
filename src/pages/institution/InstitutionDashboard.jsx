@@ -1,4 +1,4 @@
-// src/pages/InstitutionDashboard.jsx
+// src/pages/institution/InstitutionDashboard.jsx
 import React, { useState } from 'react';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import {
@@ -18,6 +18,7 @@ export default function InstitutionDashboard() {
   const [expanded, setExpanded] = useState({
     students: false,
     staff: false,
+    analytics: false,
   });
 
   const handleLogout = () => {
@@ -41,7 +42,9 @@ export default function InstitutionDashboard() {
           {/* Overview */}
           <button
             onClick={() => navigate('/institution-dashboard')}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 text-gray-700 dark:text-gray-200"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 ${
+              location.pathname === '/institution-dashboard' ? 'bg-red-100 dark:bg-red-900 font-semibold' : ''
+            } text-gray-700 dark:text-gray-200`}
           >
             <FaHome /> Overview
           </button>
@@ -83,7 +86,7 @@ export default function InstitutionDashboard() {
             )}
           </div>
 
-          {/* Staff Section */}
+          {/* Staff Section (Dropdown) */}
           <div>
             <button
               onClick={() => toggleSection('staff')}
@@ -98,56 +101,52 @@ export default function InstitutionDashboard() {
               <div className="ml-8 mt-2 space-y-2 text-sm">
                 <button
                   onClick={() => navigate('/institution-dashboard/staff/view')}
-                  className="flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
+                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900 ${
+                    location.pathname === '/institution-dashboard/staff/view' ? 'font-bold' : ''
+                  }`}
                 >
                   <FaEye /> View
                 </button>
                 <button
-                  onClick={() => navigate('/institution-dashboard/staff/add')}
-                  className="flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
+                  onClick={() => navigate('/institution-dashboard/staff')}
+                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900 ${
+                    location.pathname === '/institution-dashboard/staff' ? 'font-bold' : ''
+                  }`}
                 >
                   <FaPlus /> Add
-                </button>
-                <button
-                  onClick={() => navigate('/institution-dashboard/staff/delete')}
-                  className="flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
-                >
-                  <FaTrash /> Delete
                 </button>
               </div>
             )}
           </div>
 
-          {/* Analytics */}
           {/* Analytics Section */}
-<div>
-  <button
-    onClick={() => toggleSection('analytics')}
-    className="flex items-center justify-between w-full px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 text-gray-700 dark:text-gray-200"
-  >
-    <span className="flex items-center gap-2">
-      <FaChartPie /> Analytics
-    </span>
-    <span>{expanded.analytics ? '▴' : '▾'}</span>
-  </button>
-  {expanded.analytics && (
-    <div className="ml-8 mt-2 space-y-2 text-sm">
-      <button
-        onClick={() => navigate('/institution-dashboard/analytics/department')}
-        className="flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
-      >
-        📊 Department-wise
-      </button>
-      <button
-        onClick={() => navigate('/institution-dashboard/analytics/placement')}
-        className="flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
-      >
-        🎯 Placement
-      </button>
-    </div>
-  )}
-</div>
-
+          <div>
+            <button
+              onClick={() => toggleSection('analytics')}
+              className="flex items-center justify-between w-full px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 text-gray-700 dark:text-gray-200"
+            >
+              <span className="flex items-center gap-2">
+                <FaChartPie /> Analytics
+              </span>
+              <span>{expanded.analytics ? '▴' : '▾'}</span>
+            </button>
+            {expanded.analytics && (
+              <div className="ml-8 mt-2 space-y-2 text-sm">
+                <button
+                  onClick={() => navigate('/institution-dashboard/analytics/department')}
+                  className="flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
+                >
+                  📊 Department-wise
+                </button>
+                <button
+                  onClick={() => navigate('/institution-dashboard/analytics/placement')}
+                  className="flex items-center gap-2 px-2 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900"
+                >
+                  🎯 Placement
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Logout */}
           <button
