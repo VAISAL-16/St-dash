@@ -6,7 +6,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const allowedInstitutions = [
-  { username: 'college123', password: 'inst123' },
+  { username: 'surya', password: '123' },
   { username: 'department456', password: 'inst456' }
 ];
 
