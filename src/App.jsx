@@ -9,6 +9,7 @@ import VerifyOtp from './pages/VerifyOtp';
 
 // Public Pages
 import Landing from './pages/Landing';
+import StudentDirectory from "./pages/admin/StudentDirectory";
 
 // Admin Dashboard Layout + Pages
 import DashboardLayout from './layouts/DashboardLayout';
@@ -63,6 +64,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/student-directory" element={<StudentDirectory />} />
         <Route
           path="/student-view"
           element={

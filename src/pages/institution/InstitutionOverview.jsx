@@ -1,5 +1,7 @@
 // src/pages/institution/InstitutionOverview.jsx
 import React from 'react';
+import NotificationViewer from '../../components/NotificationViewer';
+
 import {
   FaUserGraduate,
   FaChalkboardTeacher,
@@ -13,6 +15,7 @@ import {
   FaBook,
   FaClipboardList,
   FaUsersCog,
+  FaBell,
 } from 'react-icons/fa';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -20,6 +23,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, T
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 export default function InstitutionOverview() {
+  const [showNotifications, setShowNotifications] = React.useState(false);
   const stats = [
     { icon: <FaUserGraduate />, label: 'Total Students', value: 300, color: 'bg-red-100 text-red-600' },
     { icon: <FaChalkboardTeacher />, label: 'Total Faculty', value: 45, color: 'bg-blue-100 text-blue-600' },
@@ -162,6 +166,24 @@ export default function InstitutionOverview() {
           ))}
         </ul>
       </div>
+      <div className="mt-6">
+        <div
+          className="flex items-center justify-between cursor-pointer bg-gray-100 dark:bg-gray-800 p-3 rounded-md shadow-sm"
+          onClick={() => setShowNotifications(!showNotifications)}
+        >
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FaBell className="text-yellow-500" />
+            Notifications
+          </h2>
+          <button className="text-sm text-blue-600 hover:underline">
+            {showNotifications ? "Hide" : "Show"}
+          </button>
+        </div>
+
+        {showNotifications && (
+          <div className="mt-3 bg-white dark:bg-gray-900 p-3 rounded-md shadow border max-h-[300px] overflow-y-auto">
+            <NotificationViewer role="institution" />
+          </div>)}</div>
     </div>
-  );
+);
 }
