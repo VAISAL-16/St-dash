@@ -52,7 +52,7 @@ export default function Topbar() {
   }, []);
 
   return (
-    <header className="w-full flex items-center justify-between px-6 py-3 shadow-md bg-white dark:bg-gray-900 dark:text-white z-50">
+    <header className="w-full flex items-center rounded-xl justify-between px-6 py-3 shadow-md bg-gray-200 dark:bg-gray-900 dark:text-white z-50">
       {/* Left: Empty or Logo (optional) */}
       <div />
 
